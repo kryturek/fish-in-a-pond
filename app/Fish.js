@@ -7,6 +7,7 @@ class Fish{
 
         this.vel = createVector(0, 0);
         this.acc = createVector(0, 0);
+
     }
 
     move(){
@@ -19,15 +20,15 @@ class Fish{
     show(){
         noStroke();
         fill(255, 255, 100);
-        ellipse(this.pos.x, this.pos.y, this.radius);
+        ellipse(this.pos.x, this.pos.y, this.radius*2);
     }
 
     applyForce(force){
-        this.acc.add(force);
+        let adjustedForce = p5.Vector.div(force, this.mass);
+        this.acc.add(adjustedForce);
     }
 
     constrain(){
-        console.log(this.pos.y);
         if(this.pos.x - this.radius < 0){
             this.vel.x *= -1;
             this.pos.x = this.radius;
@@ -43,6 +44,23 @@ class Fish{
         if(this.pos.y + this.radius > height){
             this.pos.y = height - this.radius;
             this.vel.y *= -1;
+        }
+    }
+
+    friction(){
+        let diff = height - (this.pos.y + this.radius);
+        if(diff < 1){
+            // F = -1 * mu * N * v^
+
+            let friction = this.vel.copy();
+            friction.normalize();
+            friction.mult(-1);
+
+            let normal = this.mass;
+
+            friction.setMag(normal * mu);
+
+            this.applyForce(friction);
         }
     }
 }
